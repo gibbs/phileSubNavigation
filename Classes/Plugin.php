@@ -33,13 +33,12 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
         {
             $tree = null;
 
-            $files = \Phile\Utility::getFiles(
-                CONTENT_DIR,'/^.*\\' . CONTENT_EXT . '/'
-            );
+            $pagesRepository = new \Phile\Repository\Page();
+            $pages = $pagesRepository->findAll(\Phile\Registry::get('Phile_Settings'));
 
             // Caching Disabled
             if($this->settings['cache'] !== true) {
-                $tree = $this->generateTree(CONTENT_DIR, $files, CONTENT_EXT);
+                $tree = $this->generateTree($pages);
             }
             // Caching Enabled
             else {
@@ -47,7 +46,7 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
                 $tree = $this->getCache(CONTENT_DIR);
 
                 if($tree === false OR !is_array($tree) ) {
-                    $tree = $this->generateTree(CONTENT_DIR, $files, CONTENT_EXT);
+                    $tree = $this->generateTree($pages);
 
                     // Cache the current tree
                     $this->setCache(CONTENT_DIR, $tree);
@@ -66,22 +65,17 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
     /**
      * Generate a hierarchical array based on a content directory
      *
-     * @param   string  $directory  The content directory
-     * @param   array   $files      An array of each file path
-     * @param   string  $extension  The file extension
+     * @param   array   $pages      An array of \Phile\Repository\Page objects
      * @return  array   $hierarchy  The hierarchy array
      */
-    protected function generateTree($directory, $files, $extension)
+    protected function generateTree($pages)
     {
         $hierarchy = array();
 
-        foreach($files as $file) {
-            $meta = new \Phile\Model\Meta(file_get_contents($file));
-            $uri  = str_replace(array($directory, $extension), '', $file);
-
+        foreach($pages as $page) {
             // Convert index files
             // @FIXME: Should this be optional?
-            $uri   = str_replace('index', '/', $uri);
+            $uri   = str_replace('index', '/', $page->getUrl());
 
             $parts = array_filter( explode('/', $uri) );
 
@@ -101,7 +95,7 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
                 // Add meta data to end of array
                 if(end($parts) == $part)
                     $list[$part] = array(
-                        'meta' => $meta,
+                        'meta' => $page->getMeta(),
                         'uri'  => implode('/', $parts)
                     );
             }

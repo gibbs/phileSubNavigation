@@ -6,7 +6,6 @@
 
 	// Exclude the following top levels
 	'exclude' => array(
-		'404',
 	),
 
 	// Prints the hierarchy (with print_r)
