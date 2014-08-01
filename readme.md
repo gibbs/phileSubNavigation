@@ -9,7 +9,7 @@ hierarchy tree that can be used to make nested navigation menus.
 **Install via composer**
 
 ```bash
-composer require "gibbs/phile-sub-navigation:1.*"
+php composer.phar require gibbs/phile-sub-navigation:1.*
 ```
 
 **Install via git**
@@ -41,7 +41,7 @@ of the template engine you are using.
 More examples are available on the 
 [wiki](https://github.com/Gibbs/phileSubNavigation/wiki)
 
-**Twig Example**
+**Twig - Minimal Example**
 
 ~~~html
 <!-- Twig Macro -->
