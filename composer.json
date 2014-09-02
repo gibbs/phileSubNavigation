@@ -1,16 +1,16 @@
 {
     "name": "gibbs/phile-sub-navigation",
     "type": "phile-plugin",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "license": "MIT",
     "description": "Generates a philecms nested hierarchy",
-    "homepage": "http://dangibbs.co.uk/",
-    "keywords": ["cms","phile","philecms", "navigation"],
+    "homepage": "https://github.com/Gibbs/",
+    "keywords": ["cms","phile","philecms", "navigation", "subnavigation"],
     "authors": [
         {
             "name": "Dan Gibbs",
             "email": "daniel.gibbs@gmail.com",
-            "homepage": "http://dangibbs.co.uk/",
+            "homepage": "https://github.com/Gibbs/",
             "role": "Developer"
         }
     ],

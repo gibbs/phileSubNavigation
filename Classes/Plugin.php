@@ -4,6 +4,7 @@
  *
  * @package gibbs\phileSubNavigation
  * @author  Dan Gibbs <daniel.gibbs@gmail.com>
+ * @license MIT
  */
 namespace Phile\Plugin\Gibbs\phileSubNavigation;
 
@@ -93,11 +94,15 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
                 $list = array($part => array('children' => $list));
 
                 // Add meta data to end of array
-                if(end($parts) == $part)
+                if(end($parts) == $part) {
+                    $uri = implode('/', $parts);
+
                     $list[$part] = array(
                         'meta' => $page->getMeta(),
-                        'uri'  => implode('/', $parts)
+                        'uri'  => $uri,
+                        'url'  => $this->config['base_url']  . '/' . $uri,
                     );
+                }
             }
 
             $hierarchy = array_merge_recursive($hierarchy, $list);
@@ -140,5 +145,16 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
 
         $storage->set('hierarchy_modified', filemtime($directory . '/.'));
         $storage->set('hierarchy_object', $data);
+    }
+
+    /**
+     * Sort hierarchy
+     *
+     * @param   array   $pages      An array of \Phile\Repository\Page objects
+     * @return  array   $hierarchy  The hierarchy array
+     */
+    proected function sort()
+    {
+
     }
 }
