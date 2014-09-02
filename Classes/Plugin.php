@@ -100,7 +100,7 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
                     $list[$part] = array(
                         'meta' => $page->getMeta(),
                         'uri'  => $uri,
-                        'url'  => $this->config['base_url']  . '/' . $uri,
+                        'url'  => \Phile\Utility::getBaseUrl()  . '/' . $uri,
                     );
                 }
             }
@@ -145,16 +145,5 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
 
         $storage->set('hierarchy_modified', filemtime($directory . '/.'));
         $storage->set('hierarchy_object', $data);
-    }
-
-    /**
-     * Sort hierarchy
-     *
-     * @param   array   $pages      An array of \Phile\Repository\Page objects
-     * @return  array   $hierarchy  The hierarchy array
-     */
-    proected function sort()
-    {
-
     }
 }

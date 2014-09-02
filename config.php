@@ -2,15 +2,11 @@
 
     // Cache the generated hierarchy.
     // Requires phile\\simpleFileDataPersistence to be enabled in your config.
-    'cache' => true,
-
-    // Sort order. Set to null to disable altogether
-    // SORT_ASC, SORT_DESC
-    'sort' => SORT_ASC,
+    'cache' => false,
 
     // Exclude the following top levels
     'exclude' => array(
-        // 'example'
+        // 'example',
     ),
 
     // Prints the hierarchy (with print_r)
