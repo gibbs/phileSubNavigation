@@ -1,7 +1,7 @@
 {
     "name": "gibbs/phile-sub-navigation",
     "type": "phile-plugin",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "license": "MIT",
     "description": "Generates a philecms nested hierarchy",
     "homepage": "https://github.com/Gibbs/",

@@ -4,13 +4,15 @@
  *
  * @package gibbs\phileSubNavigation
  * @author  Dan Gibbs <daniel.gibbs@gmail.com>
- * @license MIT
  */
 namespace Phile\Plugin\Gibbs\phileSubNavigation;
 
 class Plugin extends \Phile\Plugin\AbstractPlugin implements
     \Phile\Gateway\EventObserverInterface
 {
+    protected $current_path = null;
+    protected $current_host = null;
+
     /**
      * Register plugin events via the constructor
      *
@@ -18,6 +20,7 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
      */
     public function __construct()
     {
+        \Phile\Event::registerEvent('request_uri', $this);
         \Phile\Event::registerEvent('template_engine_registered', $this);
     }
 
@@ -30,8 +33,16 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
      */
     public function on($eventKey, $data = null)
     {
+        if($eventKey == 'request_uri')
+        {
+            // Set the current path
+            $this->current_path = $data['uri'];
+        }
+
         if($eventKey == 'template_engine_registered')
         {
+            //print_r($data); die();
+            $this->current_host = $data['data']['base_url'];
             $tree = null;
 
             $pagesRepository = new \Phile\Repository\Page();
@@ -74,38 +85,61 @@ class Plugin extends \Phile\Plugin\AbstractPlugin implements
         $hierarchy = array();
 
         foreach($pages as $page) {
-            // Convert index files
-            // @FIXME: Should this be optional?
-            $uri   = str_replace('index', '/', $page->getUrl());
+            // The page path
+            $page_path = str_replace('index', '/', $page->getUrl());
 
-            $parts = array_filter( explode('/', $uri) );
+            // An array of the page path
+            $path_components = array_filter( explode('/', $page_path) );
+
+            // Skip the homepage
+            if( !is_array($path_components) )
+                continue;
 
             // Skip excluded pages
-            if( !is_array($parts) )
+            if( isset($path_components[0]) 
+                AND in_array($path_components[0], $this->settings['exclude']) )
                 continue;
 
-            if( isset($parts[0]) 
-                AND in_array($parts[0], $this->settings['exclude']) )
-                continue;
+            // Current page hierarchy
+            $list   = array();
+            $depth  = sizeof($path_components);
+            $active = false;
 
-            $list = array();
+            // Start from the last child and work up
+            foreach( array_reverse($path_components) as $child ) {
 
-            foreach ( array_reverse($parts) as $key => $part ) {
-                $list = array($part => array('children' => $list));
+                // Add meta data to the last child
+                if(end($path_components) == $child) {
 
-                // Add meta data to end of array
-                if(end($parts) == $part) {
-                    $uri = implode('/', $parts);
+                    // Active page
+                    $active = $this->current_path == $page_path ? true : false;
 
-                    $list[$part] = array(
-                        'meta' => $page->getMeta(),
-                        'uri'  => $uri,
-                        'url'  => \Phile\Utility::getBaseUrl()  . '/' . $uri,
+                    if($depth == 1)
+                        $parent = false;
+                    else
+                        $parent = str_replace('/' . $child, '', $page_path);
+
+                    $list[$child] = array(
+                        'active'  => $active,
+                        'level'   => $depth,
+                        'meta'    => $page->getMeta(),
+                        'path'    => $page_path,
+                        'parent'  => $parent, 
+                        'uri'     => $page_path,
+                        'url'     => $this->current_host . '/' . $page_path,
                     );
                 }
+                // Move children underneath parents
+                else {
+                    $list = array($child => array('children' => $list));
+                }
+
+                // Decrement current level/depth
+                $depth = $depth--;
             }
 
-            $hierarchy = array_merge_recursive($hierarchy, $list);
+            // Merge
+            $hierarchy = array_replace_recursive($list, $hierarchy);
         }
 
         return $hierarchy;
